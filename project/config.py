@@ -2,6 +2,7 @@ import os
 import pathlib
 from functools import lru_cache
 
+"""FastAPI Config"""
 
 class BaseConfig:
     BASE_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent
