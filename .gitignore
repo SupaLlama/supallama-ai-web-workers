@@ -1,6 +1,9 @@
 # GitHub Python.gitignore file
 # source: https://raw.githubusercontent.com/github/gitignore/main/Python.gitignore
 
+# PyCharm IDE
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
