@@ -19,36 +19,36 @@ COPY ./requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 
 # Copy shell script
-COPY ./compose/local/fastapi/entrypoint /entrypoint
+COPY ./compose/local/fastapi/entrypoint.sh /entrypoint.sh
 # Convert Windows line endings to Unix line endings via sed
-RUN sed -i 's/\r$//g' /entrypoint
-RUN chmod +x /entrypoint
+RUN sed -i 's/\r$//g' /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Copy shell script
-COPY ./compose/local/fastapi/start /start
+COPY ./compose/local/fastapi/start.sh /start.sh
 # Convert Windows line endings to Unix line endings via sed
-RUN sed -i 's/\r$//g' /start
-RUN chmod +x /start
+RUN sed -i 's/\r$//g' /start.sh
+RUN chmod +x /start.sh
 
 # Copy shell script
-COPY ./compose/local/fastapi/celery/worker/start /start-celeryworker
+COPY ./compose/local/fastapi/celery/worker/start.sh /start-celeryworker.sh
 # Remove all carriage returns from the file via sed
-RUN sed -i 's/\r$//g' /start-celeryworker
-RUN chmod +x /start-celeryworker
+RUN sed -i 's/\r$//g' /start-celeryworker.sh
+RUN chmod +x /start-celeryworker.sh
 
 # Copy shell script
-COPY ./compose/local/fastapi/celery/beat/start /start-celerybeat
+COPY ./compose/local/fastapi/celery/beat/start.sh /start-celerybeat.sh
 # Remove all carriage returns from the file via sed
-RUN sed -i 's/\r$//g' /start-celerybeat
-RUN chmod +x /start-celerybeat
+RUN sed -i 's/\r$//g' /start-celerybeat.sh
+RUN chmod +x /start-celerybeat.sh
 
 # Copy shell script
-COPY ./compose/local/fastapi/celery/flower/start /start-flower
+COPY ./compose/local/fastapi/celery/flower/start.sh /start-flower.sh
 # Remove all carriage returns from the file via sed
-RUN sed -i 's/\r$//g' /start-flower
-RUN chmod +x /start-flower
+RUN sed -i 's/\r$//g' /start-flower.sh
+RUN chmod +x /start-flower.sh
 
 # Location in the container where we copied the source code
 WORKDIR /app
 
-ENTRYPOINT ["/entrypoint"]
+ENTRYPOINT ["/entrypoint.sh"]

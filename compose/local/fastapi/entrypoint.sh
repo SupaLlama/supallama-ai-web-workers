@@ -42,4 +42,5 @@ until postgres_ready; do
 done
 >&2 echo 'PostgreSQL is available'
 
+# Make this Entrypoint script a passthrough
 exec "$@"
