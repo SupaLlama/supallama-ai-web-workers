@@ -29,6 +29,7 @@ mdurl==0.1.2
 orjson==3.10.5
 prometheus_client==0.20.0
 prompt_toolkit==3.0.47
+psycopg2-binary==2.9.9
 pydantic==2.7.4
 pydantic_core==2.18.4
 Pygments==2.18.0
