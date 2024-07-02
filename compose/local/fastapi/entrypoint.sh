@@ -43,4 +43,6 @@ done
 >&2 echo 'PostgreSQL is available'
 
 # Make this Entrypoint script a passthrough
+# that then runs the docker command
+# https://stackoverflow.com/questions/39082768/what-does-set-e-and-exec-do-for-docker-entrypoint-scripts/39082923#39082923
 exec "$@"
