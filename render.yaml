@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: supallama-ai-fastapi-app
+    name: supallama-ai-web-workers-fastapi-app
     region: oregon
     runtime: python
     buildCommand: "pip install -r requirements.txt"
@@ -8,11 +8,11 @@ services:
     envVars:
       - key: CELERY_BROKER_URL
         fromService:
-          name: celery-redis
+          name: supallama-ai-web-workers-celery-redis
           type: redis
           property: connectionString
   - type: redis
-    name: supallama-ai-celery-redis
+    name: supallama-ai-web-workers-celery-redis
     region: oregon
     plan: starter # use a plan with persistence
     maxmemoryPolicy: noeviction # recommended policy for queues
