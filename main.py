@@ -1,4 +1,3 @@
-from project import create_app
+from app import create_fastapi_app
 
-app = create_app()
-celery = app.celery_app
+app = create_fastapi_app()
