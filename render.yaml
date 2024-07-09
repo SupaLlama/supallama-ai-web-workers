@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: fastapi-app
+    region: oregon
+    runtime: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: CELERY_BROKER_URL
+        fromService:
+          name: celery-redis
+          type: redis
+          property: connectionString
+  - type: redis
+    name: celery-redis
+    region: oregon
+    plan: starter # use a plan with persistence
+    maxmemoryPolicy: noeviction # recommended policy for queues
+    ipAllowList: [] # only allow internal connections
