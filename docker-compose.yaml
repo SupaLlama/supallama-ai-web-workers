@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    image: fastapi-web
+    image: supallama-ai-web-workers-fastapi-web
     # '/start.sh' is the command to start fastapi inside container
     command: /start-fastapi.sh
     # This volume is used to map the files and folders on
