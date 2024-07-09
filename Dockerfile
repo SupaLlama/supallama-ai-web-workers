@@ -18,11 +18,17 @@ RUN apt-get update \
 COPY ./requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 
-# Copy 'start-fastapi' shell script
+# Copy 'start-fastapi.sh' shell script
 COPY ./scripts/start-fastapi.sh /start-fastapi.sh
 # Convert Windows line endings to Unix line endings via sed
 RUN sed -i 's/\r$//g' /start-fastapi.sh
 RUN chmod +x /start-fastapi.sh
+
+# Copy 'start-celery-worker.sh' shell script
+COPY ./scripts/start-celery-worker.sh /start-celery-worker.sh
+# Remove all carriage returns from the file via sed
+RUN sed -i 's/\r$//g' /start-celery-worker.sh
+RUN chmod +x /start-celery-worker.sh
 
 # Set container directory with the copied source code
 WORKDIR /app
