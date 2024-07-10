@@ -10,9 +10,17 @@ from app.config import settings
    to avoid circular imports, and allow this 
    file to work as expected anywhere in the app."""
 
+# Constants
+TEMPLATE_OWNER: str = "SupaLlama"
+TEMPLATE_REPOS: List[str] = [
+    "supallama-worker-starter",
+    "supallama-web-starter",
+    "supallama-render-starter"
+]
+
 
 @shared_task
-def create_repos_from_templates_task(app_prefix: str, repo_urls: List[str]) -> str:
+def create_repos_from_templates_task(app_prefix: str):
     # Debugging with rdb
     #
     # from celery.contrib import rdb
@@ -20,28 +28,21 @@ def create_repos_from_templates_task(app_prefix: str, repo_urls: List[str]) -> s
 
     print("********** Inside create repos task! ************")
     print(f"app_prefix: {app_prefix}")
-    print(f"repo_urls: {repo_urls}")
-    
-    github_token = settings.GITHUB_PERSONAL_ACCESS_TOKEN
 
-    TEMPLATE_OWNER = "SupaLlama"
-    TEMPLATE_REPO = "supallama-worker-starter" 
+    for template_repo in TEMPLATE_REPOS:
+        print(f"Cloning template repo: {template_repo}")   
 
-    url = f"https://api.github.com/repos/{TEMPLATE_OWNER}/{TEMPLATE_REPO}/generate"
-    print("url", url)
-    data = { 
-        "owner": "supallama",
-        "name": "ash-created-this-repo-from-a-template",
-        "private": True
-    }
-    headers = {
-        "Accept": "application/vnd.github+json",
-        "Authorization": f"Bearer {github_token}",
-        "X-GitHub-Api-Version": "2022-11-28"
-    }
+        url = f"https://api.github.com/repos/{TEMPLATE_OWNER}/{template_repo}/generate"
+        data = { 
+            "owner": f"{TEMPLATE_OWNER}",
+            "name": f"{app_prefix}-{template_repo}",
+            "private": True
+        }
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {settings.GITHUB_PERSONAL_ACCESS_TOKEN}",
+            "X-GitHub-Api-Version": "2022-11-28"
+        }
 
-    response = requests.post(url, headers=headers, json=data)
-    print("status code", response.status_code)
-    print("json response", response.json())
-
-    return "created?!"
+        response = requests.post(url, headers=headers, json=data)
+        print("status code", response.status_code)
