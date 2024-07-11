@@ -190,7 +190,7 @@ f"""services:
     runtime: python
     name: {app_prefix}-user-copy-created-via-supallama-worker-starter
     region: oregon
-    repo: https://github.com/SupaLlama/{app_prefix}-supallama-copy-created-via-supallama-worker-starter
+    repo: https://github.com/SupaLlama/{app_prefix}-user-copy-created-via-supallama-worker-starter
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
     envVars:
