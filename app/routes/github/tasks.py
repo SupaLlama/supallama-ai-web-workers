@@ -58,6 +58,7 @@ def create_repos_from_templates_task(app_prefix: str):
 
         # If Render repo, create a render.yaml file
         if template_repo == "supallama-render-starter":
+            time.sleep(4)
             print(f"Updating render.yaml file in: {new_repo_name}")   
             path = "render.yaml"
             print(f" https://api.github.com/repos/{TEMPLATE_OWNER}/{new_repo_name}/contents/{path}")
@@ -159,6 +160,7 @@ Click the button below to deploy this app on Render!
 
         # If Render repo, create a render.yaml file
         if template_repo == "supallama-render-starter":
+            time.sleep(4)
             print(f"Updating render.yaml file in: {new_repo_name}")   
             path = "render.yaml"
             print(f" https://api.github.com/repos/{TEMPLATE_OWNER}/{new_repo_name}/contents/{path}")
