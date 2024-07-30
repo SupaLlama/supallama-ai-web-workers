@@ -25,20 +25,22 @@ TEMPLATE_REPOS: List[str] = [
 
 
 @shared_task
-def create_repos_from_templates_task(app_prefix: str):
+def create_repos_from_templates_task(app_name: str, app_type: str, github_username_for_transfer: str):
     # Debugging with rdb
     #
     # from celery.contrib import rdb
     # rdb.set_trace()
 
     print("********** Inside create repos task! ************")
-    print(f"app_prefix: {app_prefix}")
+    print(f"app_name: {app_name}")
+    print(f"app_type: {app_type}")
+    print(f"github_username_for_transfer: {github_username_for_transfer}")
 
     for template_repo in TEMPLATE_REPOS:
 
         # Create a copy of the template repo with SupaLlama as the owner
         print(f"Cloning template repo: {template_repo}")   
-        new_repo_name = f"{app_prefix}-supallama-copy-created-via-{template_repo}"
+        new_repo_name = f"{app_name}"
         print(new_repo_name)
         url = f"https://api.github.com/repos/{TEMPLATE_OWNER}/{template_repo}/generate"
         data = { 
@@ -68,40 +70,40 @@ def create_repos_from_templates_task(app_prefix: str):
                 "content": base64.b64encode(
 f"""services:
   - type: redis
-    name: {app_prefix}-supallama-copy-created-via-supallama-redis-starter
+    name: {app_name}-supallama-copy-created-via-supallama-redis-starter
     region: oregon
     plan: starter # use a plan with persistence
     maxmemoryPolicy: noeviction # recommended policy for queues
     ipAllowList: [] # only allow internal connections
   - type: web
     runtime: node
-    name: {app_prefix}-supallama-copy-created-via-supallama-web-starter
+    name: {app_name}-supallama-copy-created-via-supallama-web-starter
     region: oregon
-    repo: https://github.com/SupaLlama/{app_prefix}-supallama-copy-created-via-supallama-web-starter
+    repo: https://github.com/SupaLlama/{app_name}-supallama-copy-created-via-supallama-web-starter
     buildCommand: "npm install; npm run build" 
     startCommand: "npm run start"
     envVars:
       - key: FASTAPI_URL
         fromService:
-          name: {app_prefix}-supallama-copy-created-via-supallama-worker-starter
+          name: {app_name}-supallama-copy-created-via-supallama-worker-starter
           type: web
           envVarKey: RENDER_EXTERNAL_URL
   - type: web
     runtime: python
-    name: {app_prefix}-supallama-copy-created-via-supallama-worker-starter
+    name: {app_name}-supallama-copy-created-via-supallama-worker-starter
     region: oregon
-    repo: https://github.com/SupaLlama/{app_prefix}-supallama-copy-created-via-supallama-worker-starter
+    repo: https://github.com/SupaLlama/{app_name}-supallama-copy-created-via-supallama-worker-starter
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: CELERY_BROKER_URL
         fromService:
-          name: {app_prefix}-supallama-copy-created-via-supallama-redis-starter
+          name: {app_name}-supallama-copy-created-via-supallama-redis-starter
           type: redis
           property: connectionString
       - key: CELERY_RESULT_URL
         fromService:
-          name: {app_prefix}-supallama-copy-created-via-supallama-redis-starter
+          name: {app_name}-supallama-copy-created-via-supallama-redis-starter
           type: redis
           property: connectionString""".encode("ascii")).decode("ascii")
             }
@@ -124,7 +126,7 @@ f"""
 Click the button below to deploy this app on Render!
 <br />
 <br />
-<a href="https://render.com/deploy?repo=https://github.com/{TEMPLATE_OWNER}/{app_prefix}-supallama-copy-created-via-supallama-render-starter">
+<a href="https://render.com/deploy?repo=https://github.com/{TEMPLATE_OWNER}/{app_name}-supallama-copy-created-via-supallama-render-starter">
   <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
 </a>
 """.encode("ascii")).decode("ascii")
@@ -140,7 +142,7 @@ Click the button below to deploy this app on Render!
 
         # Create a 2nd copy of the template repo and transfer ownership to the user
         print(f"Cloning template repo: {template_repo}")   
-        new_repo_name = f"{app_prefix}-user-copy-created-via-{template_repo}"
+        new_repo_name = f"{app_name}-user-copy-created-via-{template_repo}"
         print(new_repo_name)
         url = f"https://api.github.com/repos/{TEMPLATE_OWNER}/{template_repo}/generate"
         data = { 
@@ -170,40 +172,40 @@ Click the button below to deploy this app on Render!
                 "content": base64.b64encode(
 f"""services:
   - type: redis
-    name: {app_prefix}-user-copy-created-via-supallama-redis-starter
+    name: {app_name}-user-copy-created-via-supallama-redis-starter
     region: oregon
     plan: starter # use a plan with persistence
     maxmemoryPolicy: noeviction # recommended policy for queues
     ipAllowList: [] # only allow internal connections
   - type: web
     runtime: node
-    name: {app_prefix}-user-copy-created-via-supallama-web-starter
+    name: {app_name}-user-copy-created-via-supallama-web-starter
     region: oregon
-    repo: https://github.com/SupaLlama/{app_prefix}-user-copy-created-via-supallama-web-starter
+    repo: https://github.com/SupaLlama/{app_name}-user-copy-created-via-supallama-web-starter
     buildCommand: "npm install; npm run build" 
     startCommand: "npm run start"
     envVars:
       - key: FASTAPI_URL
         fromService:
-          name: {app_prefix}-user-copy-created-via-supallama-worker-starter
+          name: {app_name}-user-copy-created-via-supallama-worker-starter
           type: web
           envVarKey: RENDER_EXTERNAL_URL
   - type: web
     runtime: python
-    name: {app_prefix}-user-copy-created-via-supallama-worker-starter
+    name: {app_name}-user-copy-created-via-supallama-worker-starter
     region: oregon
-    repo: https://github.com/SupaLlama/{app_prefix}-user-copy-created-via-supallama-worker-starter
+    repo: https://github.com/SupaLlama/{app_name}-user-copy-created-via-supallama-worker-starter
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: CELERY_BROKER_URL
         fromService:
-          name: {app_prefix}-user-copy-created-via-supallama-redis-starter
+          name: {app_name}-user-copy-created-via-supallama-redis-starter
           type: redis
           property: connectionString
       - key: CELERY_RESULT_URL
         fromService:
-          name: {app_prefix}-user-copy-created-via-supallama-redis-starter
+          name: {app_name}-user-copy-created-via-supallama-redis-starter
           type: redis
           property: connectionString""".encode("ascii")).decode("ascii")
             }
@@ -225,7 +227,7 @@ f"""
 Click the button below to deploy this app on Render!
 <br />
 <br />
-<a href="https://render.com/deploy?repo=https://github.com/{TEMPLATE_OWNER}/{app_prefix}-user-copy-created-via-supallama-render-starter">
+<a href="https://render.com/deploy?repo=https://github.com/{TEMPLATE_OWNER}/{app_name}-user-copy-created-via-supallama-render-starter">
   <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
 </a>
 """.encode("ascii")).decode("ascii")
@@ -241,7 +243,7 @@ Click the button below to deploy this app on Render!
         print("Transferring ownership of 2nd copy of repo")
         url = f"https://api.github.com/repos/{TEMPLATE_OWNER}/{new_repo_name}/transfer"
         data = { 
-            "new_owner": "ashtable",
+            "new_owner": "github_username_for_transfer",
         }
         headers = {
             "Accept": "application/vnd.github+json",

@@ -14,6 +14,8 @@ from .tasks import create_repos_from_templates_task
 @github_router.post("/create-repos-from-templates")
 def create_repos_from_templates(request_body: CreateReposFromTemplatesBody):
     task = create_repos_from_templates_task.delay(
-        request_body.app_prefix
+        request_body.app_name,
+        request_body.app_type,
+        request_body.github_username_for_transfer,
     )
     return JSONResponse({"task_id": task.task_id})
