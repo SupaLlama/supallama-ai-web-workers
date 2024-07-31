@@ -243,7 +243,7 @@ Click the button below to deploy this app on Render!
         print("Transferring ownership of 2nd copy of repo")
         url = f"https://api.github.com/repos/{TEMPLATE_OWNER}/{new_repo_name}/transfer"
         data = { 
-            "new_owner": "github_username_for_transfer",
+            "new_owner": github_username_for_transfer,
         }
         headers = {
             "Accept": "application/vnd.github+json",
