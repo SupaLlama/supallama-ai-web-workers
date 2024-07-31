@@ -40,7 +40,7 @@ def create_repos_from_templates_task(app_name: str, app_type: str, github_userna
 
         # Create a copy of the template repo with SupaLlama as the owner
         print(f"Cloning template repo: {template_repo}")   
-        new_repo_name = f"{app_name}"
+        new_repo_name = f"{app_name}-supallama-copy-created-via-{template_repo}"
         print(new_repo_name)
         url = f"https://api.github.com/repos/{TEMPLATE_OWNER}/{template_repo}/generate"
         data = { 
