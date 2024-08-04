@@ -16,13 +16,10 @@ from app.config import settings
 # Constants
 TEMPLATE_OWNER: str = "SupaLlama"
 TEMPLATE_REPOS: List[str] = [
-    "supallama-worker-starter",
-    "supallama-web-starter",
-    "supallama-render-starter"
+    "supallama-rag-backend-python-fastapi-celery-redis-supabase-langchain-pinecone-template",
+    "supallama-rag-frontend-typescript-nextjs-shadcnui-supabase-langchain-pinecone-template",
+    "supallama-rag-render-supabase-langchain-pinecone-template"
 ]
-
-
-
 
 @shared_task
 def create_repos_from_templates_task(app_name: str, app_type: str, github_username_for_transfer: str):
@@ -35,13 +32,33 @@ def create_repos_from_templates_task(app_name: str, app_type: str, github_userna
     print(f"app_name: {app_name}")
     print(f"app_type: {app_type}")
     print(f"github_username_for_transfer: {github_username_for_transfer}")
+    
+    new_render_repo_name = f"{app_name}-render"
+    new_frontend_repo_name = f"{app_name}-frontend"
+    new_backend_repo_name = f"{app_name}-backend"
+
+    new_user_render_repo_name = f"{app_name}-{github_username_for_transfer}-render"
+    new_user_frontend_repo_name = f"{app_name}-{github_username_for_transfer}-frontend"
+    new_user_backend_repo_name = f"{app_name}-{github_username_for_transfer}-backend"
+
 
     for template_repo in TEMPLATE_REPOS:
-
         # Create a copy of the template repo with SupaLlama as the owner
         print(f"Cloning template repo: {template_repo}")   
-        new_repo_name = f"{app_name}-supallama-copy-created-via-{template_repo}"
-        print(new_repo_name)
+        new_repo_name = f"{app_name}-"
+        new_user_repo_name = f"{app_name}-{github_username_for_transfer}-"
+        if (template_repo == "supallama-rag-render-supabase-langchain-pinecone-template"):
+            new_repo_name += "render"
+            new_user_repo_name += "render"
+        if (template_repo == "supallama-rag-frontend-typescript-nextjs-shadcnui-supabase-langchain-pinecone-template"):
+            new_repo_name += "frontend"
+            new_user_repo_name += "frontend"
+        if (template_repo == "supallama-rag-backend-python-fastapi-celery-redis-supabase-langchain-pinecone-template"):
+            new_repo_name += "backend"
+            new_user_repo_name += "backend"
+
+        print(f"new repo name: {new_repo_name}")
+
         url = f"https://api.github.com/repos/{TEMPLATE_OWNER}/{template_repo}/generate"
         data = { 
             "owner": f"{TEMPLATE_OWNER}",
@@ -54,12 +71,12 @@ def create_repos_from_templates_task(app_name: str, app_type: str, github_userna
             "X-GitHub-Api-Version": "2022-11-28"
         }
         response = requests.post(url, headers=headers, json=data)
-        print("status code", response.status_code)
+        print("repo cloned status code", response.status_code)
 
         time.sleep(1)
 
         # If Render repo, create a render.yaml file
-        if template_repo == "supallama-render-starter":
+        if template_repo == "supallama-rag-render-supabase-langchain-pinecone-template":
             time.sleep(4)
             print(f"Updating render.yaml file in: {new_repo_name}")   
             path = "render.yaml"
@@ -70,40 +87,40 @@ def create_repos_from_templates_task(app_name: str, app_type: str, github_userna
                 "content": base64.b64encode(
 f"""services:
   - type: redis
-    name: {app_name}-supallama-copy-created-via-supallama-redis-starter
+    name: {app_name}-redis
     region: oregon
     plan: starter # use a plan with persistence
     maxmemoryPolicy: noeviction # recommended policy for queues
     ipAllowList: [] # only allow internal connections
   - type: web
     runtime: node
-    name: {app_name}-supallama-copy-created-via-supallama-web-starter
+    name: {app_name}-web
     region: oregon
-    repo: https://github.com/SupaLlama/{app_name}-supallama-copy-created-via-supallama-web-starter
+    repo: https://github.com/{TEMPLATE_OWNER}/{new_frontend_repo_name}
     buildCommand: "npm install; npm run build" 
     startCommand: "npm run start"
     envVars:
       - key: FASTAPI_URL
         fromService:
-          name: {app_name}-supallama-copy-created-via-supallama-worker-starter
+          name: {app_name}-worker
           type: web
           envVarKey: RENDER_EXTERNAL_URL
   - type: web
     runtime: python
-    name: {app_name}-supallama-copy-created-via-supallama-worker-starter
+    name: {app_name}-worker
     region: oregon
-    repo: https://github.com/SupaLlama/{app_name}-supallama-copy-created-via-supallama-worker-starter
+    repo: https://github.com/{TEMPLATE_OWNER}/{new_backend_repo_name}
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: CELERY_BROKER_URL
         fromService:
-          name: {app_name}-supallama-copy-created-via-supallama-redis-starter
+          name: {app_name}-redis
           type: redis
           property: connectionString
       - key: CELERY_RESULT_URL
         fromService:
-          name: {app_name}-supallama-copy-created-via-supallama-redis-starter
+          name: {app_name}-redis
           type: redis
           property: connectionString""".encode("ascii")).decode("ascii")
             }
@@ -113,8 +130,7 @@ f"""services:
                 "X-GitHub-Api-Version": "2022-11-28"
             }
             response = requests.put(url, headers=headers, json=data)
-            print("status code", response.status_code)
-            print(response.json())
+            print("writer render.yaml status code", response.status_code)
 
             path = "README.md"
             print(f" https://api.github.com/repos/{TEMPLATE_OWNER}/{new_repo_name}/contents/{path}")
@@ -126,7 +142,7 @@ f"""
 Click the button below to deploy this app on Render!
 <br />
 <br />
-<a href="https://render.com/deploy?repo=https://github.com/{TEMPLATE_OWNER}/{app_name}-supallama-copy-created-via-supallama-render-starter">
+<a href="https://render.com/deploy?repo=https://github.com/{TEMPLATE_OWNER}/{new_render_repo_name}">
   <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
 </a>
 """.encode("ascii")).decode("ascii")
@@ -137,17 +153,16 @@ Click the button below to deploy this app on Render!
                 "X-GitHub-Api-Version": "2022-11-28"
             }
             response = requests.put(url, headers=headers, json=data)
-            print("status code", response.status_code)
-            print(response.json())
+            print("write render README status code", response.status_code)
+
 
         # Create a 2nd copy of the template repo and transfer ownership to the user
-        print(f"Cloning template repo: {template_repo}")   
-        new_repo_name = f"{app_name}-user-copy-created-via-{template_repo}"
-        print(new_repo_name)
+        print(f"Cloning template repo 2nd time: {template_repo}")   
+        print(f"New user repo name: {new_user_repo_name}")
         url = f"https://api.github.com/repos/{TEMPLATE_OWNER}/{template_repo}/generate"
         data = { 
             "owner": f"{TEMPLATE_OWNER}",
-            "name": new_repo_name,
+            "name": new_user_repo_name,
             "private": True
         }
         headers = {
@@ -156,56 +171,56 @@ Click the button below to deploy this app on Render!
             "X-GitHub-Api-Version": "2022-11-28"
         }
         response = requests.post(url, headers=headers, json=data)
-        print("status code", response.status_code)
+        print("2nd copy of repo cloned status code", response.status_code)
 
         time.sleep(1)
 
         # If Render repo, create a render.yaml file
-        if template_repo == "supallama-render-starter":
+        if template_repo == "supallama-rag-render-supabase-langchain-pinecone-template":
             time.sleep(4)
-            print(f"Updating render.yaml file in: {new_repo_name}")   
+            print(f"Updating render.yaml file in: {new_user_repo_name}")   
             path = "render.yaml"
-            print(f" https://api.github.com/repos/{TEMPLATE_OWNER}/{new_repo_name}/contents/{path}")
-            url = f" https://api.github.com/repos/{TEMPLATE_OWNER}/{new_repo_name}/contents/{path}"
+            print(f" https://api.github.com/repos/{TEMPLATE_OWNER}/{new_user_repo_name}/contents/{path}")
+            url = f" https://api.github.com/repos/{TEMPLATE_OWNER}/{new_user_repo_name}/contents/{path}"
             data = { 
                 "message": "Added render.yaml to define infrastructure blueprint",
                 "content": base64.b64encode(
 f"""services:
   - type: redis
-    name: {app_name}-user-copy-created-via-supallama-redis-starter
+    name: {app_name}-redis
     region: oregon
     plan: starter # use a plan with persistence
     maxmemoryPolicy: noeviction # recommended policy for queues
     ipAllowList: [] # only allow internal connections
   - type: web
     runtime: node
-    name: {app_name}-user-copy-created-via-supallama-web-starter
+    name: {app_name}-web
     region: oregon
-    repo: https://github.com/SupaLlama/{app_name}-user-copy-created-via-supallama-web-starter
+    repo: https://github.com/{github_username_for_transfer}/{new_user_frontend_repo_name}
     buildCommand: "npm install; npm run build" 
     startCommand: "npm run start"
     envVars:
       - key: FASTAPI_URL
         fromService:
-          name: {app_name}-user-copy-created-via-supallama-worker-starter
+          name: {app_name}-worker
           type: web
           envVarKey: RENDER_EXTERNAL_URL
   - type: web
     runtime: python
-    name: {app_name}-user-copy-created-via-supallama-worker-starter
+    name: {app_name}-worker
     region: oregon
-    repo: https://github.com/SupaLlama/{app_name}-user-copy-created-via-supallama-worker-starter
+    repo: https://github.com/{github_username_for_transfer}/{new_user_backend_repo_name}
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: CELERY_BROKER_URL
         fromService:
-          name: {app_name}-user-copy-created-via-supallama-redis-starter
+          name: {app_name}-redis
           type: redis
           property: connectionString
       - key: CELERY_RESULT_URL
         fromService:
-          name: {app_name}-user-copy-created-via-supallama-redis-starter
+          name: {app_name}-redis
           type: redis
           property: connectionString""".encode("ascii")).decode("ascii")
             }
@@ -215,11 +230,11 @@ f"""services:
                 "X-GitHub-Api-Version": "2022-11-28"
             }
             response = requests.put(url, headers=headers, json=data)
-            print("status code", response.status_code)
+            print("wrote 2nd copy of render.yaml status code", response.status_code)
 
             path = "README.md"
-            print(f" https://api.github.com/repos/{TEMPLATE_OWNER}/{new_repo_name}/contents/{path}")
-            url = f" https://api.github.com/repos/{TEMPLATE_OWNER}/{new_repo_name}/contents/{path}"
+            print(f" https://api.github.com/repos/{TEMPLATE_OWNER}/{new_user_repo_name}/contents/{path}")
+            url = f" https://api.github.com/repos/{TEMPLATE_OWNER}/{new_user_repo_name}/contents/{path}"
             data = {
                 "message": "Added README file with Deploy button",
                 "content": base64.b64encode(
@@ -227,7 +242,7 @@ f"""
 Click the button below to deploy this app on Render!
 <br />
 <br />
-<a href="https://render.com/deploy?repo=https://github.com/{TEMPLATE_OWNER}/{app_name}-user-copy-created-via-supallama-render-starter">
+<a href="https://render.com/deploy?repo=https://github.com/{github_username_for_transfer}/{new_user_render_repo_name}">
   <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
 </a>
 """.encode("ascii")).decode("ascii")
@@ -238,10 +253,10 @@ Click the button below to deploy this app on Render!
                 "X-GitHub-Api-Version": "2022-11-28"
             }
             response = requests.put(url, headers=headers, json=data)
-            print("status code", response.status_code)
+            print("wrote 2nd copy of render README status code", response.status_code)
 
         print("Transferring ownership of 2nd copy of repo")
-        url = f"https://api.github.com/repos/{TEMPLATE_OWNER}/{new_repo_name}/transfer"
+        url = f"https://api.github.com/repos/{TEMPLATE_OWNER}/{new_user_repo_name}/transfer"
         data = { 
             "new_owner": github_username_for_transfer,
         }
@@ -251,6 +266,6 @@ Click the button below to deploy this app on Render!
             "X-GitHub-Api-Version": "2022-11-28"
         }
         response = requests.post(url, headers=headers, json=data)
-        print("status code", response.status_code)
+        print("repo transfer status code", response.status_code)
 
         time.sleep(1)
