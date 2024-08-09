@@ -15,11 +15,9 @@ from app.config import settings
 
 # Constants
 TEMPLATE_OWNER: str = "SupaLlama"
-TEMPLATE_REPOS: List[str] = [
-    "supallama-rag-backend-python-fastapi-celery-redis-supabase-langchain-pinecone-template",
-    "supallama-rag-frontend-typescript-nextjs-shadcnui-supabase-langchain-pinecone-template",
-    "supallama-rag-render-supabase-langchain-pinecone-template"
-]
+LANGCHAIN_APP_TYPE: str = "langchain"
+LLAMAINDEX_APP_TYPE: str = "llamaindex"
+GRIPTAPE_APP_TYPE: str = "griptape"
 
 @shared_task
 def create_repos_from_templates_task(app_name: str, app_type: str, github_username_for_transfer: str):
@@ -32,6 +30,22 @@ def create_repos_from_templates_task(app_name: str, app_type: str, github_userna
     print(f"app_name: {app_name}")
     print(f"app_type: {app_type}")
     print(f"github_username_for_transfer: {github_username_for_transfer}")
+
+    if app_type == LANGCHAIN_APP_TYPE:
+        backend_template = "supallama-rag-backend-python-fastapi-celery-redis-supabase-langchain-pinecone-template",
+        frontend_template = "supallama-rag-frontend-typescript-nextjs-shadcnui-supabase-template"
+        infrastructure_template = "supallama-rag-render-supabase-langchain-pinecone-template"
+    elif app_type == GRIPTAPE_APP_TYPE:
+        backend_template = "supallama-rag-backend-python-fastapi-celery-redis-supabase-griptape-pinecone-template"
+        frontend_template = "supallama-rag-frontend-typescript-nextjs-shadcnui-supabase-template"
+        infrastructure_template = "supallama-rag-render-supabase-langchain-pinecone-template"
+
+
+    TEMPLATE_REPOS: List[str] = [
+        backend_template,
+        frontend_template,
+        infrastructure_template,        
+    ]
     
     new_render_repo_name = f"{app_name}-render"
     new_frontend_repo_name = f"{app_name}-frontend"
@@ -76,7 +90,7 @@ def create_repos_from_templates_task(app_name: str, app_type: str, github_userna
         time.sleep(1)
 
         # If Render repo, create a render.yaml file
-        if template_repo == "supallama-rag-render-supabase-langchain-pinecone-template":
+        if template_repo == infrastructure_template:
             time.sleep(4)
             print(f"Updating render.yaml file in: {new_repo_name}")   
             path = "render.yaml"
@@ -176,7 +190,7 @@ Click the button below to deploy this app on Render!
         time.sleep(1)
 
         # If Render repo, create a render.yaml file
-        if template_repo == "supallama-rag-render-supabase-langchain-pinecone-template":
+        if template_repo == infrastructure_template:
             time.sleep(4)
             print(f"Updating render.yaml file in: {new_user_repo_name}")   
             path = "render.yaml"
