@@ -32,42 +32,41 @@ def create_repos_from_templates_task(app_name: str, app_type: str, github_userna
     print(f"github_username_for_transfer: {github_username_for_transfer}")
 
     if app_type == LANGCHAIN_APP_TYPE:
-        backend_template = "supallama-rag-backend-python-fastapi-celery-redis-supabase-langchain-pinecone-template",
+        backend_template = "supallama-rag-backend-python-fastapi-celery-redis-supabase-langchain-pinecone-template"
         frontend_template = "supallama-rag-frontend-typescript-nextjs-shadcnui-supabase-template"
-        infrastructure_template = "supallama-rag-render-supabase-langchain-pinecone-template"
+        infrastructure_template = "supallama-rag-render-template"
     elif app_type == GRIPTAPE_APP_TYPE:
         backend_template = "supallama-rag-backend-python-fastapi-celery-redis-supabase-griptape-pinecone-template"
         frontend_template = "supallama-rag-frontend-typescript-nextjs-shadcnui-supabase-template"
-        infrastructure_template = "supallama-rag-render-supabase-langchain-pinecone-template"
+        infrastructure_template = "supallama-rag-render-template"
 
-
-    TEMPLATE_REPOS: List[str] = [
+    template_repos: List[str] = [
         backend_template,
         frontend_template,
         infrastructure_template,        
     ]
     
-    new_render_repo_name = f"{app_name}-render"
+    new_infrastructure_repo_name = f"{app_name}-render"
     new_frontend_repo_name = f"{app_name}-frontend"
     new_backend_repo_name = f"{app_name}-backend"
 
-    new_user_render_repo_name = f"{app_name}-{github_username_for_transfer}-render"
+    new_user_infrastructure_repo_name = f"{app_name}-{github_username_for_transfer}-render"
     new_user_frontend_repo_name = f"{app_name}-{github_username_for_transfer}-frontend"
     new_user_backend_repo_name = f"{app_name}-{github_username_for_transfer}-backend"
 
 
-    for template_repo in TEMPLATE_REPOS:
+    for template_repo in template_repos:
         # Create a copy of the template repo with SupaLlama as the owner
         print(f"Cloning template repo: {template_repo}")   
         new_repo_name = f"{app_name}-"
         new_user_repo_name = f"{app_name}-{github_username_for_transfer}-"
-        if (template_repo == "supallama-rag-render-supabase-langchain-pinecone-template"):
+        if template_repo == infrastructure_template:
             new_repo_name += "render"
             new_user_repo_name += "render"
-        if (template_repo == "supallama-rag-frontend-typescript-nextjs-shadcnui-supabase-langchain-pinecone-template"):
+        elif template_repo == frontend_template:
             new_repo_name += "frontend"
             new_user_repo_name += "frontend"
-        if (template_repo == "supallama-rag-backend-python-fastapi-celery-redis-supabase-langchain-pinecone-template"):
+        elif template_repo == backend_template:
             new_repo_name += "backend"
             new_user_repo_name += "backend"
 
@@ -156,7 +155,7 @@ f"""
 Click the button below to deploy this app on Render!
 <br />
 <br />
-<a href="https://render.com/deploy?repo=https://github.com/{TEMPLATE_OWNER}/{new_render_repo_name}">
+<a href="https://render.com/deploy?repo=https://github.com/{TEMPLATE_OWNER}/{new_infrastructure_repo_name}">
   <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
 </a>
 """.encode("ascii")).decode("ascii")
@@ -256,7 +255,7 @@ f"""
 Click the button below to deploy this app on Render!
 <br />
 <br />
-<a href="https://render.com/deploy?repo=https://github.com/{github_username_for_transfer}/{new_user_render_repo_name}">
+<a href="https://render.com/deploy?repo=https://github.com/{github_username_for_transfer}/{new_user_infrastructure_repo_name}">
   <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
 </a>
 """.encode("ascii")).decode("ascii")
