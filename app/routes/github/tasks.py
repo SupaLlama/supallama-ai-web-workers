@@ -114,17 +114,32 @@ f"""services:
     startCommand: "npm run start"
     envVars:
       - key: FASTAPI_URL
+        value: http://{app_name}-api:10000
+  - type: pserv
+    runtime: python
+    name: {app_name}-api
+    region: oregon
+    repo: https://github.com/{TEMPLATE_OWNER}/{new_backend_repo_name}
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: CELERY_BROKER_URL
         fromService:
-          name: {app_name}-worker
-          type: web
-          envVarKey: RENDER_EXTERNAL_URL
-  - type: web
+          name: {app_name}-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_RESULT_URL
+        fromService:
+          name: {app_name}-redis
+          type: redis
+          property: connectionString
+  - type: worker
     runtime: python
     name: {app_name}-worker
     region: oregon
     repo: https://github.com/{TEMPLATE_OWNER}/{new_backend_repo_name}
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    startCommand: "celery -A main.celery worker --loglevel=info --concurrency 2"
     envVars:
       - key: CELERY_BROKER_URL
         fromService:
@@ -214,17 +229,32 @@ f"""services:
     startCommand: "npm run start"
     envVars:
       - key: FASTAPI_URL
+           value: http://{app_name}-api:10000
+  - type: pserv
+    runtime: python
+    name: {app_name}-api
+    region: oregon
+    repo: https://github.com/{TEMPLATE_OWNER}/{new_user_backend_repo_name}
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: CELERY_BROKER_URL
         fromService:
-          name: {app_name}-worker
-          type: web
-          envVarKey: RENDER_EXTERNAL_URL
-  - type: web
+          name: {app_name}-redis
+          type: redis
+          property: connectionString
+      - key: CELERY_RESULT_URL
+        fromService:
+          name: {app_name}-redis
+          type: redis
+          property: connectionString
+  - type: worker
     runtime: python
     name: {app_name}-worker
     region: oregon
     repo: https://github.com/{github_username_for_transfer}/{new_user_backend_repo_name}
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "uvicorn main:app --host 0.0.0.0 --port $PORT"
+    startCommand: "celery -A main.celery worker --loglevel=info --concurrency 2"
     envVars:
       - key: CELERY_BROKER_URL
         fromService:
