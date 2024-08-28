@@ -229,7 +229,7 @@ f"""services:
     startCommand: "npm run start"
     envVars:
       - key: FASTAPI_URL
-           value: http://{app_name}-api:10000
+        value: http://{app_name}-api:10000
   - type: pserv
     runtime: python
     name: {app_name}-api
