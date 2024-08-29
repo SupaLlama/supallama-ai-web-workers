@@ -10,8 +10,11 @@ class BaseConfig:
     CELERY_BROKER_URL: str = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
     CELERY_RESULT_BACKEND: str = os.environ.get("CELERY_RESULT_URL", "redis://127.0.0.1:6379/0")
 
-    GITHUB_CLASSIC_PERSONAL_ACCESS_TOKEN: str = os.environ.get("GITHUB_CLASSIC_PERSONAL_ACCESS_TOKEN", "") #os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN", "")
+    GITHUB_CLASSIC_PERSONAL_ACCESS_TOKEN: str = os.environ.get("GITHUB_CLASSIC_PERSONAL_ACCESS_TOKEN", "") 
     GITHUB_PERSONAL_ACCESS_TOKEN: str = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN", "")
+
+    SUPABASE_SERVICE_ROLE_KEY: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+    SUPABASE_URL: str = os.environ.get("SUPABASE_URL", "")
 
 
 class DevelopmentConfig(BaseConfig):
