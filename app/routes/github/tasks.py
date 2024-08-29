@@ -30,7 +30,7 @@ def create_repos_from_templates_task(user_id: str, supallama_app_id: str, app_na
     # from celery.contrib import rdb
     # rdb.set_trace()
 
-    update_status_of_record_in_supallama_apps_table(supallama_app_id, user_id, SUPALLAMA_APP_STATUS["generating_code"])
+    update_status_of_record_in_supallama_apps_table(supallama_apps_id=int(supallama_app_id), user_id=user_id, status=SUPALLAMA_APP_STATUS["generating_code"])
 
     if app_type == LANGCHAIN_APP_TYPE:
         backend_template = "supallama-rag-backend-python-fastapi-celery-redis-supabase-langchain-pinecone-template"
@@ -313,5 +313,4 @@ Click the button below to deploy this app on Render!
         print("repo transfer status code", response.status_code)
 
         time.sleep(1)
-    
-    update_status_of_record_in_supallama_apps_table(supallama_app_id, user_id, SUPALLAMA_APP_STATUS["completed"])
+    update_status_of_record_in_supallama_apps_table(supallama_apps_id=int(supallama_app_id), user_id=user_id, status=SUPALLAMA_APP_STATUS["completed"])

@@ -62,7 +62,7 @@ def get_user_from_supabase_auth(encoded_access_token: str) -> Union[str, None]:
         return None
 
 
-def update_status_of_record_in_supallama_apps_table(supalllama_apps_id: int, user_id: str, status: str) -> None:
+def update_status_of_record_in_supallama_apps_table(supallama_apps_id: int, user_id: str, status: str) -> None:
     """
     Updates a record in the supallama_apps table's status 
     if, and only if, the id and user_id of the record in
@@ -72,15 +72,15 @@ def update_status_of_record_in_supallama_apps_table(supalllama_apps_id: int, use
 
     logger.info("In the update_status_of_record_in_supallama_apps_table utility function")
 
-    if supalllama_apps_id is None or type(supalllama_apps_id) is not int or supalllama_apps_id < 1: 
-        logger.error(f"Invalid crawled_urls_id: {supalllama_apps_id}")
+    if supallama_apps_id is None or type(supallama_apps_id) is not int or supallama_apps_id < 1: 
+        logger.error(f"Invalid supallama_apps_id: {type(supallama_apps_id) } {supallama_apps_id}")
         return None
 
-    if user_id is None or type(user_id) is not str or len(user_id.trim()) == 0:
+    if user_id is None or type(user_id) is not str or len(user_id.strip()) == 0:
         logger.error(f"Invalid user_id: {user_id}")
         return None
      
-    if status is None or type(status) is not str or len(status.trim()) == 0:
+    if status is None or type(status) is not str or len(status.strip()) == 0:
         logger.error(f"Invalid status: {status}")
         return None
 
@@ -91,13 +91,13 @@ def update_status_of_record_in_supallama_apps_table(supalllama_apps_id: int, use
             settings.SUPABASE_SERVICE_ROLE_KEY
         )
 
-        logger.info(f"Update status to {status} for supallama_apps row ID: {supalllama_apps_id} for user_id: {user_id}")
+        logger.info(f"Update status to {status} for supallama_apps row ID: {supallama_apps_id} for user_id: {user_id}")
         response = (
             supabase_client.table("supallama_apps")
             .update({
-                "status": status,
+                "app_status": status,
             })
-            .eq("id", supalllama_apps_id)
+            .eq("id", supallama_apps_id)
             .eq("user_id", user_id)
             .execute()
         ) 
