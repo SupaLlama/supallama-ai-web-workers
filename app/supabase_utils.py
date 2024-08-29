@@ -91,18 +91,18 @@ def update_status_of_record_in_supallama_apps_table(supalllama_apps_id: int, use
             settings.SUPABASE_SERVICE_ROLE_KEY
         )
 
-        logger.info(f"Update status to {status} for crawled_urls row ID: {supalllama_apps_id} for user_id: {user_id}")
+        logger.info(f"Update status to {status} for supallama_apps row ID: {supalllama_apps_id} for user_id: {user_id}")
         response = (
-            supabase_client.table("crawled_urls")
+            supabase_client.table("supallama_apps")
             .update({
                 "status": status,
             })
-            .eq("id", crawled_urls_id)
+            .eq("id", supalllama_apps_id)
             .eq("user_id", user_id)
             .execute()
         ) 
         
-        logger.info(f"Update crawled_urls record response: {response}")
+        logger.info(f"Update supallama_apps record response: {response}")
 
         # Return the updated record's data
         return response.data
