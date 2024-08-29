@@ -28,6 +28,10 @@ def create_repos_from_templates(request_body: CreateReposFromTemplatesBody) -> J
         logger.error(f"Invalid JWT: {request_body.access_token}")
         return JSONResponse({"error": "Invalid JWT"})
 
+    if request_body.supallama_app_id is None or type(request_body.supallama_app_id) is not str:
+        logger.error(f"Invalid SupaLlama App ID: {request_body.supallama_app_id}")
+        return JSONResponse({"error": "Invalid SupaLlama App ID"})
+
     if request_body.app_name is None or type(request_body.app_name) is not str:
         logger.error(f"Invalid App Name: {request_body.app_name}")
         return JSONResponse({"error": "Invalid App Name"})
@@ -47,6 +51,7 @@ def create_repos_from_templates(request_body: CreateReposFromTemplatesBody) -> J
     logger.info("Verifying the JWT using the JWT Secret and 'authenticated' audience")
     task = create_repos_from_templates_task.delay(
         user_id,
+        request_body.supallama_app_id,
         request_body.app_name,
         request_body.app_type,
         request_body.github_username_for_transfer,

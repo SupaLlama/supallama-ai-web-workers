@@ -1,4 +1,5 @@
 import base64
+import logging
 import time
 from typing import List
 
@@ -7,11 +8,10 @@ from celery import shared_task
 import requests
 
 from app.config import settings
-
-
-"""Define as shared_task instead of celery.task 
-   to avoid circular imports, and allow this 
-   file to work as expected anywhere in the app."""
+from app.supabase_utils import (
+    SUPALLAMA_APP_STATUS,
+    update_status_of_record_in_supallama_apps_table,
+)
 
 # Constants
 TEMPLATE_OWNER: str = "SupaLlama"
@@ -19,17 +19,18 @@ LANGCHAIN_APP_TYPE: str = "langchain"
 LLAMAINDEX_APP_TYPE: str = "llamaindex"
 GRIPTAPE_APP_TYPE: str = "griptape"
 
+
+"""Define as shared_task instead of celery.task 
+   to avoid circular imports, and allow this 
+   file to work as expected anywhere in the app."""
 @shared_task
-def create_repos_from_templates_task(app_name: str, app_type: str, github_username_for_transfer: str):
+def create_repos_from_templates_task(user_id: str, supallama_app_id: str, app_name: str, app_type: str, github_username_for_transfer: str):
     # Debugging with rdb
     #
     # from celery.contrib import rdb
     # rdb.set_trace()
 
-    print("********** Inside create repos task! ************")
-    print(f"app_name: {app_name}")
-    print(f"app_type: {app_type}")
-    print(f"github_username_for_transfer: {github_username_for_transfer}")
+    update_status_of_record_in_supallama_apps_table(supallama_app_id, user_id, SUPALLAMA_APP_STATUS["generating_code"])
 
     if app_type == LANGCHAIN_APP_TYPE:
         backend_template = "supallama-rag-backend-python-fastapi-celery-redis-supabase-langchain-pinecone-template"
@@ -312,3 +313,5 @@ Click the button below to deploy this app on Render!
         print("repo transfer status code", response.status_code)
 
         time.sleep(1)
+    
+    update_status_of_record_in_supallama_apps_table(supallama_app_id, user_id, SUPALLAMA_APP_STATUS["completed"])
