@@ -13,6 +13,7 @@ class BaseConfig:
     GITHUB_CLASSIC_PERSONAL_ACCESS_TOKEN: str = os.environ.get("GITHUB_CLASSIC_PERSONAL_ACCESS_TOKEN", "") 
     GITHUB_PERSONAL_ACCESS_TOKEN: str = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN", "")
 
+    SUPABASE_JWT_SECRET: str = os.environ.get("SUPABASE_JWT_SECRET", "")
     SUPABASE_SERVICE_ROLE_KEY: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
     SUPABASE_URL: str = os.environ.get("SUPABASE_URL", "")
 
