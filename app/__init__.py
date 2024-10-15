@@ -15,6 +15,8 @@ def create_fastapi_app() -> FastAPI:
     # Load routes
     from app.routes.github import github_router
     app.include_router(github_router)
+    from app.routes.modal import modal_router
+    app.include_router(modal_router)
 
     @app.get("/")
     async def root():
