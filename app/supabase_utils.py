@@ -2,10 +2,6 @@ from enum import Enum
 import logging
 from typing import Dict, List, Union
 
-from postgrest.exceptions import APIError
-
-from gotrue.errors import AuthApiError, AuthRetryableError
-
 from supabase import create_client, Client
 
 from app.config import settings
@@ -51,12 +47,6 @@ def get_user_from_supabase_auth(encoded_access_token: str) -> Union[str, None]:
         # Return the user's ID
         return supabase_user_response.user.id
 
-    except AuthRetryableError as error:
-        logger.error("Supabase URL is incorrect or invalid.")
-        return None
-    except AuthApiError as error:
-        logger.error("User is not logged in, or Supabase Service Role Key is incorrect.")
-        return None
     except Exception as error:
         logger.error(error)
         return None
@@ -106,12 +96,6 @@ def update_status_of_record_in_supallama_apps_table(supallama_apps_id: int, user
 
         # Return the updated record's data
         return response.data
-    except AuthRetryableError as error:
-        logger.error("Supabase URL is incorrect or invalid.")
-        return None
-    except APIError as error:
-        logger.error("Supabase Service Role Key is incorrect.")
-        return None
     except Exception as error:
         logger.error(error)
         return None

@@ -16,6 +16,8 @@ class BaseConfig:
     SUPABASE_JWT_SECRET: str = os.environ.get("SUPABASE_JWT_SECRET", "")
     SUPABASE_SERVICE_ROLE_KEY: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
     SUPABASE_URL: str = os.environ.get("SUPABASE_URL", "")
+    MODAL_TOKEN_ID: str = os.environ.get("MODAL_TOKEN_ID", "")
+    MODAL_TOKEN_SECRET: str = os.environ.get("MODAL_TOKEN_SECRET", "")
 
 
 class DevelopmentConfig(BaseConfig):
