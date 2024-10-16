@@ -15,9 +15,9 @@ from app.supabase_utils import (
 
 # Constants
 TEMPLATE_OWNER: str = "SupaLlama"
-LANGCHAIN_APP_TYPE: str = "langchain"
-LLAMAINDEX_APP_TYPE: str = "llamaindex"
-GRIPTAPE_APP_TYPE: str = "griptape"
+LANGCHAIN_RAG_CHATBOT: str = "langchain-rag-chatbot"
+LANGGRAPH_AGENTIC_WORKFLOW: str = "langgraph-agentic-workflow"
+GRIPTAPE_RAG_CHATBOT: str = "griptape-rag-chatbot"
 
 
 """Define as shared_task instead of celery.task 
@@ -32,11 +32,11 @@ def create_repos_from_templates_task(user_id: str, supallama_app_id: str, app_na
 
     update_status_of_record_in_supallama_apps_table(supallama_apps_id=int(supallama_app_id), user_id=user_id, status=SUPALLAMA_APP_STATUS["generating_code"])
 
-    if app_type == LANGCHAIN_APP_TYPE:
+    if app_type == LANGCHAIN_RAG_CHATBOT or app_type == LANGGRAPH_AGENTIC_WORKFLOW:
         backend_template = "supallama-rag-backend-python-fastapi-celery-redis-supabase-langchain-pinecone-template"
         frontend_template = "supallama-rag-frontend-typescript-nextjs-shadcnui-supabase-template"
         infrastructure_template = "supallama-rag-render-template"
-    elif app_type == GRIPTAPE_APP_TYPE:
+    elif app_type == GRIPTAPE_RAG_CHATBOT:
         backend_template = "supallama-rag-backend-python-fastapi-celery-redis-supabase-griptape-pinecone-template"
         frontend_template = "supallama-rag-frontend-typescript-nextjs-shadcnui-supabase-template"
         infrastructure_template = "supallama-rag-render-template"

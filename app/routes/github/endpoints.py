@@ -22,7 +22,7 @@ def create_repos_from_templates(request_body: CreateReposFromTemplatesBody) -> J
     GitHub repositories in the specified template 
     """
     logger.info("In '/create_repos_from_templates' route handler")
-
+    logger.info(f"Request body: {request_body}")
     logger.info("Validating the reqeust body parameters")
     if request_body.access_token is None or type(request_body.access_token) is not str:
         logger.error(f"Invalid JWT: {request_body.access_token}")
