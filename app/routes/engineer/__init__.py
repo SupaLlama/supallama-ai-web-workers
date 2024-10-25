@@ -8,4 +8,4 @@ engineer_router = APIRouter(
 
 # Import items at the end because endpoints.py
 # imports engineer_router from this module init
-from . import endpoints, schemas, tasks # noqa
+from . import agents, endpoints, models, schemas, states, tasks, tools # noqa
