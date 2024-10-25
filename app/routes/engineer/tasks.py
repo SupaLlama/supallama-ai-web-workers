@@ -9,8 +9,10 @@ from langgraph.checkpoint.memory import MemorySaver
 from .agents import CreateWebContentAgent
 from .models import azure_openai_gpt_4o_model
 from .prompts import engineer_system_prompt_template
+from .schemas import ChatMessage
 from .states import CreateWebContentAgentState
 from .tools import tavily_search_tool
+
 
 # Logging Config
 logging.basicConfig(level=logging.INFO)
@@ -18,7 +20,7 @@ logger = logging.getLogger("engineer-tasks")
 
 
 @shared_task # use @shared_task to avoid circular imports
-async def create_web_content_agentic_task(
+def create_web_content_agentic_task(
     content_description: str, 
     color_scheme: str = "Use a largely white and black color scheme with some shades of gray to brighten things up", 
     css_framework: str = "Use the Tailwind CSS framework when generating code", 
@@ -58,10 +60,13 @@ async def create_web_content_agentic_task(
 
         messages = [HumanMessage(content=content_description)]
 
-        response = await create_web_content_agent.graph.invoke(input={"messages": messages})
+        thread_id = "1"
+        thread_config = {"configurable": {"thread_id": thread_id}}
+
+        response = create_web_content_agent.graph.invoke(input={"messages": messages}, config=thread_config)
         output = response["messages"][-1]
     
-        logger.info(f"Received the following output from the create_web_content_agent:\n{output}")
+        logger.info(f"Received the following output from the create_web_content_agent:\n{output.content}")
     
     except Exception as e:
         logger.error(f"Exception in create_web_content_agentic_task: {e}")

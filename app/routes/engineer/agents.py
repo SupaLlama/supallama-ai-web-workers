@@ -39,7 +39,7 @@ class CreateWebContentAgent:
             messages = [SystemMessage(content=self.system)] + messages
         message = self.model.invoke(messages)
 
-        logger.debug(f"The model said:\n{message}")
+        logger.info(f"The model said:\n{message.content}")
 
         return { "messages": [message] }
 
@@ -50,14 +50,17 @@ class CreateWebContentAgent:
 
         for t in tool_calls:
             logger.info(f"Calling Tool: {t}")
+            logger.info(f"self.tools:\n{self.tools}")
 
-            tool_call_result = self.tools[t["name"]].invoke(t["args"])
+            #tool_call_result = self.tools[t["name"]].invoke(t["args"])
+            tool_call_result = self.tools[t['name']].invoke(t['args'])
 
-            logger.debug(f"Tool call result:\n{tool_call_result}")
+            logger.info(f"Tool call result:\n{tool_call_result}")
 
-            tool_call_results.append(
-                ToolMessage(tool_call_id=t["id"], name=t["name"], content=str(tool_call_result))
-            )
+            tool_call_results.append(ToolMessage(tool_call_id=t['id'], name=t['name'], content=str(tool_call_result)))
+            # tool_call_results.append(
+            #     ToolMessage(tool_call_id=t["id"], name=t["name"], content=str(tool_call_result))
+            # )
 
         return { "messages": tool_call_results }
 
@@ -66,8 +69,8 @@ class CreateWebContentAgent:
         logger.info(f"Checking if any tool calls remain ...")
 
         last_message = state["messages"][-1]
-        result = len(last_message.tool_calls) > 0
+        num_tool_calls = len(last_message.tool_calls)
 
-        logger.info(f"{result} tool calls remaining.")
+        logger.info(f"{num_tool_calls} tool calls remaining.")
 
-        return result
+        return num_tool_calls > 0
