@@ -5,6 +5,10 @@ from functools import lru_cache
 """FastAPI Config"""
 
 class BaseConfig:
+    AZURE_OPENAI_API_KEY: str = os.environ.get("AZURE_OPENAI_API_KEY", "")
+
+    AZURE_OPENAI_ENDPOINT: str = os.environ.get("AZURE_OPENAI_ENDPOINT", "")
+
     BASE_DIR: pathlib.Path = pathlib.Path(__file__).parent.parent
 
     CELERY_BROKER_URL: str = os.environ.get("CELERY_BROKER_URL", "redis://127.0.0.1:6379/0")
@@ -16,8 +20,6 @@ class BaseConfig:
     SUPABASE_JWT_SECRET: str = os.environ.get("SUPABASE_JWT_SECRET", "")
     SUPABASE_SERVICE_ROLE_KEY: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
     SUPABASE_URL: str = os.environ.get("SUPABASE_URL", "")
-    MODAL_TOKEN_ID: str = os.environ.get("MODAL_TOKEN_ID", "")
-    MODAL_TOKEN_SECRET: str = os.environ.get("MODAL_TOKEN_SECRET", "")
 
 
 class DevelopmentConfig(BaseConfig):
