@@ -16,6 +16,9 @@ def create_fastapi_app() -> FastAPI:
     from app.routes.github import github_router
     app.include_router(github_router)
 
+    from app.routes.engineer import engineer_router
+    app.include_router(engineer_router)
+
     @app.get("/")
     async def root():
         return {"Ping": "Pong"}
